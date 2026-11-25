@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototipo Trámites Estudiantiles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f5f9,#0f141b);--card:light-dark(#ffffff,#18202b);--ink:light-dark(#18212d,#e8edf4);
+--muted:light-dark(#4d5a6a,#a9b4c2);--line:light-dark(#d5dce5,#2c3744);--pri:light-dark(#2347b8,#8fb0ff);
+--pri-ink:light-dark(#ffffff,#0f141b);--soft:light-dark(#e8eefc,#1f2b44);--danger:light-dark(#b3261e,#ffb4ab);
+--warn-bg:light-dark(#fff4d6,#3a2f12);--warn:light-dark(#7a4a00,#ffd88a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,sans-serif;overflow-x:clip}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+header.top{display:flex;align-items:center;gap:12px;padding:10px max(3vw,14px);background:var(--card);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;margin-right:auto}
+.brand svg{flex:none}
+.who{font-size:14px;color:var(--muted);text-align:right;line-height:1.25}
+.who b{color:var(--ink);display:block}
+.ibtn{position:relative;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--card);cursor:pointer;display:grid;place-items:center}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;border-radius:10px;font-size:12px;padding:0 6px;font-weight:700}
+.btn{min-height:44px;padding:10px 18px;border-radius:10px;border:1px solid var(--pri);background:var(--pri);color:var(--pri-ink);font-weight:700;cursor:pointer}
+.btn.sec{background:transparent;color:var(--pri)}
+.btn.danger{background:transparent;border-color:var(--danger);color:var(--danger)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.block{width:100%}
+main{padding:clamp(16px,3vw,32px) max(3vw,14px);max-width:1240px;margin:0 auto}
+.narrow{max-width:560px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.stag{float:right;font-size:12px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:1px 8px}
+h1{font-size:clamp(24px,3vw,32px);line-height:1.1;margin:0 0 6px}
+h2{font-size:20px;margin:0 0 10px}
+p.sub{color:var(--muted);margin:0 0 16px}
+label{display:block;font-weight:600;font-size:15px;margin:14px 0 6px}
+.req{color:var(--danger)}
+input[type=text],input[type=email],input[type=date],input[type=password],select,textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:16px}
+textarea{min-height:96px;resize:vertical}
+.ro{background:var(--bg)!important;color:var(--muted)}
+.err{color:var(--danger);font-size:14px;margin-top:4px;min-height:0}
+.hint{color:var(--muted);font-size:14px;margin-top:4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.check{display:flex;gap:10px;align-items:flex-start;margin:16px 0;font-size:15px}
+.check input{width:22px;height:22px;flex:none;margin-top:2px}
+.alert{border-radius:10px;padding:12px 14px;margin:12px 0;font-size:15px;background:var(--soft)}
+.alert.warn{background:var(--warn-bg);color:var(--warn)}
+.alert.bad{background:light-dark(#fde7e5,#3b1715);color:var(--danger)}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:13px;font-weight:700;white-space:nowrap}
+.chip::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.s-Recibida{background:light-dark(#e6ebf2,#26303d);color:light-dark(#334155,#cbd5e1)}
+.s-En{background:light-dark(#fff1cc,#3a2f12);color:light-dark(#7a4a00,#ffd88a)}
+.s-Aprobada{background:light-dark(#dfe8ff,#1f2b44);color:light-dark(#1e3a9a,#a9c1ff)}
+.s-Rechazada{background:light-dark(#fde2df,#3b1715);color:light-dark(#9b1c14,#ffb4ab)}
+.s-Lista{background:light-dark(#dcf3e3,#173322);color:light-dark(#14532d,#9be3b4)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tab{min-height:40px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-weight:600}
+.tab[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.req-card{margin:12px 0}
+.req-card .h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:12px 0 6px}
+.steps span{height:6px;border-radius:3px;background:var(--line)}
+.steps span.on{background:var(--pri)}
+.steps-l{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:12px;color:var(--muted)}
+.obs{border-left:4px solid var(--danger);padding:8px 12px;background:var(--bg);border-radius:6px;margin-top:10px;font-size:15px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.big-acts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.big-acts button{min-height:76px;text-align:left;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+.big-acts b{display:block;font-size:17px}.big-acts small{color:var(--muted)}
+.shell{display:grid;grid-template-columns:220px 1fr;gap:24px}
+nav.side{display:flex;flex-direction:column;gap:6px}
+nav.side button{min-height:44px;text-align:left;padding:10px 14px;border-radius:10px;border:0;background:transparent;cursor:pointer;font-weight:600}
+nav.side button[aria-current=page]{background:var(--soft);color:var(--pri)}
+.filters{display:grid;grid-template-columns:200px 200px 1fr;gap:12px;margin:12px 0}
+.counts{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.counts div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:14px}
+.counts b{font-size:22px;display:block;line-height:1.1}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;background:var(--card);border-radius:12px;overflow:hidden;font-size:15px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:13px;color:var(--muted);font-weight:700;background:var(--bg)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.pend td:first-child{box-shadow:inset 4px 0 0 var(--pri)}
+.detail{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
+dl.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;margin:0}
+dl.kv dt{color:var(--muted);font-size:14px}dl.kv dd{margin:0;font-weight:600}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{position:relative;padding:0 0 14px 22px;font-size:14px}
+.tl li::before{content:"";position:absolute;left:4px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--pri)}
+.tl li::after{content:"";position:absolute;left:8px;top:18px;bottom:0;width:2px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl small{color:var(--muted);display:block}
+.att{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px}
+.att img{max-width:100%;max-height:220px;border-radius:8px;display:block;margin-top:8px}
+.doc{background:#fff;color:#1b1b1b;border:1px solid #cfd6df;border-radius:6px;padding:clamp(18px,4vw,44px);position:relative;box-shadow:0 10px 30px rgba(0,0,0,.08);font-size:15px}
+.doc .lh{display:flex;justify-content:space-between;gap:12px;border-bottom:2px solid #2347b8;padding-bottom:12px;font-size:13px}
+.doc h3{text-align:center;letter-spacing:.02em;margin:22px 0 14px;font-size:20px}
+.doc .foot{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:28px;flex-wrap:wrap}
+.seal{border:2px solid #2347b8;color:#2347b8;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;max-width:260px}
+.wm{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font-size:clamp(34px,7vw,64px);font-weight:800;color:rgba(179,38,30,.16);transform:rotate(-18deg)}
+.list-btn{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:52px;text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;margin-bottom:8px}
+.list-btn[aria-current=true]{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri) inset}
+.mail{display:grid;grid-template-columns:280px 1fr;gap:16px}
+.unread{font-weight:800}
+.panel{position:fixed;top:70px;right:14px;width:min(380px,calc(100vw - 28px));max-height:70vh;overflow:auto;z-index:20;box-shadow:0 16px 40px rgba(0,0,0,.2)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;z-index:40;max-width:calc(100vw - 28px);font-weight:600}
+.modal-bg{position:fixed;inset:0;background:rgba(10,15,25,.5);display:grid;place-items:center;z-index:30;padding:16px}
+.modal{max-width:460px;width:100%}
+.login{max-width:440px;margin:4vh auto}
+.profiles{display:grid;gap:8px;margin-top:8px}
+.profiles button{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:8px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;text-align:left}
+.profiles button[aria-pressed=true]{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri) inset}
+.profiles small{color:var(--muted)}
+.ok-card{text-align:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ok-card .n{font-size:32px;font-weight:800;color:var(--pri)}
+@media(max-width:860px){.shell,.detail,.mail{grid-template-columns:1fr}nav.side{flex-direction:row;flex-wrap:wrap}.filters{grid-template-columns:1fr 1fr}.filters .q{grid-column:1/-1}}
+@media(max-width:600px){.row2,.big-acts{grid-template-columns:1fr}dl.kv{grid-template-columns:1fr}.who{display:none}
+.stack thead{display:none}.stack tr{display:grid;padding:10px 12px;border-bottom:1px solid var(--line)}.stack td{border:0;padding:2px 0}}
+@media(max-width:600px){.v2 header.top{flex-wrap:nowrap;gap:6px}.v2 .brand small{display:none}.v2 .brand span{font-size:15px}.v2 .ibtn{width:40px;height:40px}}
+@media(prefers-reduced-motion:no-preference){.toast{animation:up .25s ease-out}@keyframes up{from{transform:translate(-50%,12px);opacity:0}}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="layer"></div>
+<script>
+{
+const VERSION = 1;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const fmtD = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+const fmtDT = d => `${fmtD(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const dayOnly = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const addBiz = (d, n) => { const r = dayOnly(d); let k = 0; while (k < n) { r.setDate(r.getDate()+1); const w = r.getDay(); if (w !== 0 && w !== 6) k++; } return r; };
+const ago = (days, h=0, m=0) => { const d = new Date(); d.setDate(d.getDate()-days); d.setHours(d.getHours()-h, d.getMinutes()-m); return d; };
+const dur = ms => { const m = Math.round(ms/60000); if (m < 60) return `${m} min`; const h = Math.floor(m/60); if (h < 24) return `${h} h ${m%60} min`; return `${Math.floor(h/24)} d ${h%24} h`; };
+const STATES = ['Recibida','En revisión','Aprobada','Lista'];
+const chip = s => `<span class="chip s-${esc(s.split(' ')[0])}">${esc(s)}</span>`;
+const ROLE = {estudiante:'Estudiante', encargado:'Encargado', secretaria:'Secretaría', direccion:'Dirección', guia:'Profesor guía'};
+const TIPOS_C = ['Constancia de estudio','Constancia de matrícula','Constancia de notas','Constancia de conducta'];
+
+const EST = {
+  E1:{nombre:'Ana Rodríguez Mora', cedula:'1-1890-0456', seccion:'10-2'},
+  E2:{nombre:'Luis Jiménez Rojas', cedula:'6-0512-0877', seccion:'11-1'},
+  E3:{nombre:'María Vargas Solís', cedula:'2-0934-0211', seccion:'9-3'},
+  E4:{nombre:'Diego Solís Chaves', cedula:'1-1902-0390', seccion:'10-2'}
+};
+const USERS = {
+  ana:{nombre:'Ana Rodríguez Mora', rol:'estudiante', correo:'ana.rodriguez@est.ejemplo.cr', est:'E1'},
+  laura:{nombre:'Laura Mora Castro', rol:'encargado', correo:'laura.mora@ejemplo.cr', est:'E1'},
+  karla:{nombre:'Karla Solano Brenes', rol:'secretaria', correo:'secretaria@ctp.ejemplo.cr'},
+  jorge:{nombre:'MSc. Jorge Arias Ulate', rol:'direccion', correo:'direccion@ctp.ejemplo.cr'},
+  daniel:{nombre:'Prof. Daniel Quesada Mora', rol:'guia', correo:'d.quesada@ctp.ejemplo.cr', seccion:'10-2'}
+};
+const code = () => { const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s=''; for (let i=0;i<8;i++) { if (i===4) s+='-'; s+=A[Math.floor(Math.random()*A.length)]; } return s; };
+
+let seq = 13;
+const S = [];
+const H = (estado, fecha, por, nota='') => ({estado, fecha, por, nota});
+S.push({num:9, tipo:'constancia', est:'E1', sol:'laura', estado:'Rechazada', asig:null, creada:ago(9,3), datos:{tipoC:'Constancia de notas', motivo:'Trámite de beca'},
+  hist:[H('Recibida',ago(9,3),'Laura Mora Castro'),H('En revisión',ago(9,1),'Secretaría'),H('Rechazada',ago(8,5),'Secretaría','Las notas del III periodo aún no están cerradas; puede solicitarla a partir del 2 de diciembre.')],
+  obs:'Las notas del III periodo aún no están cerradas; puede solicitarla a partir del 2 de diciembre.'});
+S.push({num:10, tipo:'justificacion', est:'E1', sol:'ana', estado:'Lista', asig:null, creada:ago(6,4), datos:{desde:ago(7), hasta:ago(7), motivo:'Salud', detalle:'Cita médica en la clínica', adj:{name:'dictamen_medico.pdf', type:'application/pdf', size:184000}},
+  hist:[H('Recibida',ago(6,4),'Ana Rodríguez Mora'),H('En revisión',ago(6,3),'Secretaría'),H('Aprobada',ago(6,1),'Prof. Daniel Quesada Mora','Firma electrónica del profesor guía'),H('Lista',ago(6,1),'Sistema','Archivada en el expediente digital')],
+  doc:{codigo:'K7PQ-3MXA', emitido:ago(6,1)}});
+S.push({num:11, tipo:'constancia', est:'E3', sol:'E3', estado:'Lista', asig:null, creada:ago(2,2,40), datos:{tipoC:'Constancia de estudio', motivo:'Pensión alimentaria'},
+  hist:[H('Recibida',ago(2,2,40),'María Vargas Solís'),H('En revisión',ago(2,2,35),'Secretaría'),H('Aprobada',ago(2,2,31),'Dirección'),H('Lista',ago(2,2,31),'Sistema','Sello electrónico y código QR aplicados')],
+  doc:{codigo:'R2WD-8HJN', emitido:ago(2,2,31)}});
+S.push({num:12, tipo:'constancia', est:'E2', sol:'E2', estado:'En revisión', asig:'direccion', creada:ago(0,1,10), datos:{tipoC:'Constancia de matrícula', motivo:'Licencia de conducir'},
+  hist:[H('Recibida',ago(0,1,10),'Luis Jiménez Rojas'),H('En revisión',ago(0,0,55),'Secretaría','Datos verificados; enviada a Dirección')]});
+S.push({num:13, tipo:'justificacion', est:'E4', sol:'E4', estado:'Recibida', asig:'secretaria', creada:ago(0,0,25), datos:{desde:ago(1), hasta:ago(1), motivo:'Asunto familiar', detalle:'Fallecimiento de un familiar', adj:{name:'acta_defuncion.jpg', type:'image/jpeg', size:420000}},
+  hist:[H('Recibida',ago(0,0,25),'Diego Solís Chaves')]});
+
+const NOTIF = []; const MAIL = [];
+const notify = (uid, num, texto) => {
+  const u = USERS[uid]; if (!u) return;
+  NOTIF.unshift({uid, num, texto, fecha:new Date(), leida:false});
+  MAIL.unshift({to:u.correo, uid, num, asunto:`Solicitud N.° ${pad4(num)}: ${texto}`, fecha:new Date(), leido:false});
+};
+const pad4 = n => String(n).padStart(4,'0');
+const solicitantes = r => Object.keys(USERS).filter(k => USERS[k].est === r.est);
+const notifySol = (r, texto) => solicitantes(r).forEach(k => notify(k, r.num, texto));
+MAIL.push({to:USERS.laura.correo, uid:'laura', num:9, asunto:'Solicitud N.° 0009: fue rechazada (ver observación)', fecha:ago(8,5), leido:true});
+MAIL.push({to:USERS.ana.correo, uid:'ana', num:10, asunto:'Solicitud N.° 0010: está lista y archivada', fecha:ago(6,1), leido:true});
+
+let me = null, view = 'login', sel = null, filtro = 'todas', fTipo = '', fEstado = '', fq = '', panel = null, expSel = null, mailSel = null, lastCreated = null;
+let draft = {};
+const files = {};
+
+function toast(t){ document.querySelectorAll('.toast').forEach(x=>x.remove()); const el = document.createElement('div'); el.className='toast'; el.setAttribute('role','status'); el.textContent=t; document.body.appendChild(el); setTimeout(()=>el.remove(), 3200); }
+function go(v, s){ view = v; if (s !== undefined) sel = s; panel = null; render(); window.scrollTo(0,0); }
+function modal(title, body, okText, onOk){
+  $('#layer').innerHTML = `<div class="modal-bg"><div class="card modal" role="dialog" aria-modal="true" aria-labelledby="mt"><h2 id="mt">${esc(title)}</h2><p>${esc(body)}</p><div class="acts"><button class="btn" id="mok">${esc(okText)}</button><button class="btn sec" id="mno">Cancelar</button></div></div></div>`;
+  $('#mok').onclick = () => { $('#layer').innerHTML=''; onOk(); }; $('#mno').onclick = () => $('#layer').innerHTML=''; $('#mok').focus();
+}
+
+const ICON = {
+  logo:`<svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect x="3" y="2" width="22" height="28" rx="3" fill="var(--pri)"/><rect x="8" y="8" width="12" height="2.5" rx="1" fill="var(--card)"/><rect x="8" y="13" width="12" height="2.5" rx="1" fill="var(--card)"/><circle cx="24" cy="24" r="8" fill="var(--card)" stroke="var(--pri)" stroke-width="2.5"/><path d="M20.5 24l2.5 2.5 4.5-5" fill="none" stroke="var(--pri)" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  bell:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>`,
+  mail:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`,
+  out:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>`
+};
+
+function header(){
+  const n = NOTIF.filter(x => x.uid===meId && !x.leida).length;
+  const m = MAIL.filter(x => x.uid===meId && !x.leido).length;
+  return `<header class="top"><div class="brand">${ICON.logo}<span>Trámites Estudiantiles<br><small style="font-weight:500;color:var(--muted)">CTP San Sebastián</small></span></div>
+  <div class="who"><b>${esc(me.nombre)}</b>${esc(ROLE[me.rol])}${me.seccion?` · sección ${esc(me.seccion)}`:''}</div>
+  <button class="ibtn" id="bBell" aria-label="Avisos (${n} sin leer)">${ICON.bell}${n?`<span class="badge">${n}</span>`:''}</button>
+  <button class="ibtn" id="bMail" aria-label="Correo (${m} sin leer)">${ICON.mail}${m?`<span class="badge">${m}</span>`:''}</button>
+  <button class="ibtn" id="bOut" aria-label="Cerrar sesión">${ICON.out}</button></header>`;
+}
+let meId = null;
+const isSol = () => me && (me.rol==='estudiante' || me.rol==='encargado');
+
+/* ---------- P1 ---------- */
+let pick = 'ana';
+function vLogin(){
+  return `<main><div class="card login"><span class="stag">P1</span><div class="brand" style="margin-bottom:10px">${ICON.logo}<span>Trámites Estudiantiles</span></div>
+  <h1>Iniciar sesión</h1><p class="sub">Constancias y justificaciones de ausencias en línea.</p>
+  <label for="lu">Correo institucional</label><input id="lu" type="email" class="ro" readonly value="${esc(USERS[pick].correo)}">
+  <label for="lp">Contraseña</label><input id="lp" type="password" class="ro" readonly value="prototipo">
+  <p class="hint">Elija un perfil de prueba para ingresar.</p>
+  <div class="profiles" role="group" aria-label="Perfiles de prueba">${Object.entries(USERS).map(([k,u])=>`<button data-u="${k}" aria-pressed="${k===pick}"><span>${esc(u.nombre)}<br><small>${esc(ROLE[u.rol])}${u.seccion?' · sección '+esc(u.seccion):''}</small></span><span aria-hidden="true">›</span></button>`).join('')}</div>
+  <button class="btn block" id="bIn" style="margin-top:16px">Ingresar</button></div></main>`;
+}
+
+/* ---------- P4 (inicio solicitante) ---------- */
+function myReqs(){ return S.filter(r => r.est === me.est).sort((a,b)=>b.creada-a.creada); }
+function steps(r){
+  if (r.estado==='Rechazada') return '';
+  const i = STATES.indexOf(r.estado);
+  return `<div class="steps" aria-hidden="true">${STATES.map((s,k)=>`<span class="${k<=i?'on':''}"></span>`).join('')}</div><div class="steps-l" aria-hidden="true">${STATES.map(s=>`<span>${s}</span>`).join('')}</div>`;
+}
+function vMine(){
+  const rs = myReqs().filter(r => filtro==='todas' || r.tipo===filtro);
+  const ok = lastCreated && VERSION>=2 ? S.find(r=>r.num===lastCreated) : null;
+  return `<main><div class="narrow"><span class="stag">P4</span><h1>Hola, ${esc(me.nombre.split(' ')[0])}</h1><p class="sub">Estudiante: ${esc(EST[me.est].nombre)} · sección ${esc(EST[me.est].seccion)}</p>
+  ${ok?`<div class="card ok-card" style="margin-bottom:12px"><div>Su solicitud fue enviada con el número</div><div class="n">N.° ${pad4(ok.num)}</div><div class="hint">Le avisaremos por correo a ${esc(me.correo)} cada vez que cambie de estado.</div></div>`:''}
+  <div class="big-acts"><button id="goC"><b>Solicitar constancia</b><small>Estudio, matrícula, notas o conducta</small></button><button id="goJ"><b>Justificar ausencia</b><small>Plazo: 3 días hábiles</small></button></div>
+  <h2>Mis solicitudes</h2>
+  <div class="tabs" role="group" aria-label="Filtrar">${[['todas','Todas'],['constancia','Constancias'],['justificacion','Justificaciones']].map(([k,t])=>`<button class="tab" data-f="${k}" aria-pressed="${filtro===k}">${t}</button>`).join('')}</div>
+  ${rs.length?'':'<p class="sub">No hay solicitudes con este filtro.</p>'}
+  ${rs.map(r=>`<article class="card req-card" id="r${r.num}"><div class="h"><div><b>N.° ${pad4(r.num)} · ${esc(r.tipo==='constancia'?r.datos.tipoC:'Justificación de ausencia')}</b><br><small style="color:var(--muted)">Enviada el ${fmtDT(r.creada)}</small></div>${chip(r.estado)}</div>
+  ${steps(r)}
+  ${r.estado==='Rechazada'?`<div class="obs"><b>Observación:</b> ${esc(r.obs)}</div>`:''}
+  <details style="margin-top:10px"><summary>Ver historial</summary><ul class="tl" style="margin-top:10px">${r.hist.map(h=>`<li>${chip(h.estado)} ${esc(h.nota)}<small>${fmtDT(h.fecha)} · ${esc(h.por)}</small></li>`).join('')}</ul></details>
+  ${r.estado==='Lista'?`<div class="acts"><button class="btn sec" data-doc="${r.num}">${r.tipo==='constancia'?'Ver y descargar constancia (PDF)':'Ver comprobante de justificación'}</button></div>`:''}
+  ${r.estado==='Rechazada'&&r.tipo==='constancia'?`<div class="acts"><button class="btn sec" id="again">Corregir y volver a solicitar</button></div>`:''}
+  </article>`).join('')}</div></main>`;
+}
+
+/* ---------- P2 ---------- */
+function vConst(){
+  const e = EST[me.est];
+  return `<main><div class="narrow card"><span class="stag">P2</span><h1>Solicitar constancia</h1><p class="sub">Los campos con <span class="req">*</span> son obligatorios.</p>
+  <form id="fC" novalidate>
+  <label for="cT">Tipo de constancia <span class="req">*</span></label><select id="cT"><option value="">Seleccione…</option>${TIPOS_C.map(t=>`<option ${draft.tipoC===t?'selected':''}>${t}</option>`).join('')}</select>
+  <label for="cM">Institución o motivo (opcional)</label><input id="cM" type="text" maxlength="120" placeholder="Ej.: beca, pensión, banco" value="${esc(draft.motivo||'')}">
+  <label>Datos del estudiante (desde el expediente)</label>
+  <dl class="kv card" style="background:var(--bg)"><dt>Nombre</dt><dd>${esc(e.nombre)}</dd><dt>Cédula</dt><dd>${esc(e.cedula)}</dd><dt>Sección</dt><dd>${esc(e.seccion)}</dd></dl>
+  <label for="cE">Correo para avisos <span class="req">*</span></label><input id="cE" type="email" value="${esc(draft.correo ?? me.correo)}"><div class="err" id="eE"></div>
+  <div class="check"><input type="checkbox" id="cP" ${draft.priv?'checked':''}><label for="cP" style="margin:0;font-weight:500">Acepto el aviso de privacidad: los datos se usan solo para este trámite (Ley 8968). <span class="req">*</span></label></div>
+  <button class="btn block" id="cSend" type="submit" disabled>Enviar solicitud</button>
+  <p class="hint" id="cHint">Complete los campos obligatorios para habilitar el envío.</p>
+  <button class="btn sec block" type="button" id="back">Volver</button></form></div></main>`;
+}
+const okMail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+
+/* ---------- P3 ---------- */
+function vJust(){
+  return `<main><div class="narrow card"><span class="stag">P3</span><h1>Justificar ausencia</h1><p class="sub">Estudiante: ${esc(EST[me.est].nombre)} · sección ${esc(EST[me.est].seccion)}</p>
+  <div class="alert warn" id="jPlazo">Plazo: 3 días hábiles después de la ausencia.</div>
+  <form id="fJ" novalidate>
+  <div class="row2"><div><label for="jD">Desde <span class="req">*</span></label><input id="jD" type="date"></div><div><label for="jH">Hasta <span class="req">*</span></label><input id="jH" type="date"></div></div>
+  <div class="err" id="eF"></div>
+  <label for="jM">Motivo <span class="req">*</span></label><select id="jM"><option value="">Seleccione…</option><option>Salud</option><option>Asunto familiar</option><option>Trámite legal</option><option>Otro</option></select>
+  <label for="jT">Detalle (opcional)</label><textarea id="jT" maxlength="400"></textarea>
+  <label for="jA">Comprobante <span class="req">*</span></label>
+  <div class="drop"><input id="jA" type="file" accept=".pdf,image/*"><div class="hint" id="jAh">${VERSION>=2?'Formatos: PDF, JPG o PNG · máximo 5 MB':'PDF o imagen'}</div></div><div class="err" id="eA"></div>
+  <button class="btn block" id="jSend" type="submit" disabled style="margin-top:16px">Enviar justificación</button>
+  <button class="btn sec block" type="button" id="back" style="margin-top:8px">Volver</button></form></div></main>`;
+}
+
+/* ---------- P5 correo ---------- */
+function vMail(){
+  const ms = MAIL.filter(x=>x.uid===meId);
+  const m = ms[mailSel ?? 0];
+  if (m) m.leido = true;
+  const r = m && S.find(x=>x.num===m.num);
+  return `<main><span class="stag">P5</span><h1>Correo electrónico</h1><p class="sub">Avisos recibidos en ${esc(me.correo)}.</p>
+  <div class="mail"><div>${ms.length?ms.map((x,i)=>`<button class="list-btn ${x.leido?'':'unread'}" data-m="${i}" aria-current="${i===(mailSel??0)}"><span>${esc(x.asunto)}<br><small style="color:var(--muted);font-weight:400">${fmtDT(x.fecha)}</small></span></button>`).join(''):'<p class="sub">Sin correos.</p>'}</div>
+  ${m?`<article class="card"><dl class="kv"><dt>De</dt><dd>tramites@ctp.ejemplo.cr</dd><dt>Para</dt><dd>${esc(m.to)}</dd><dt>Asunto</dt><dd>${esc(m.asunto)}</dd><dt>Fecha</dt><dd>${fmtDT(m.fecha)}</dd></dl><hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <p>Hola, ${esc(me.nombre.split(' ')[0])}:</p><p>La solicitud <b>N.° ${pad4(m.num)}</b> ${r?`de ${esc(EST[r.est].nombre)} se encuentra en estado ${chip(r.estado)}`:'cambió de estado'}.</p>
+  ${r&&r.estado==='Rechazada'?`<div class="obs"><b>Observación:</b> ${esc(r.obs)}</div>`:''}
+  <div class="acts"><button class="btn" data-open="${m.num}">${isSol()?'Ver mis solicitudes':'Abrir solicitud'}</button></div>
+  <p class="hint">Mensaje automático del sistema de trámites. No responda este correo.</p></article>`:''}</div></main>`;
+}
+
+/* ---------- P6 bandeja ---------- */
+function visible(){
+  return S.filter(r => {
+    if (me.rol==='secretaria') return true;
+    if (me.rol==='direccion') return r.tipo==='constancia';
+    if (me.rol==='guia') return r.tipo==='justificacion' && EST[r.est].seccion===me.seccion;
+    return false;
+  });
+}
+const pendingFor = r => r.asig === me.rol && !['Rechazada','Lista','Aprobada'].includes(r.estado);
+function side(cur){
+  return `<nav class="side" aria-label="Menú"><button data-nav="inbox" aria-current="${cur==='inbox'?'page':'false'}">Bandeja</button><button data-nav="exp" aria-current="${cur==='exp'?'page':'false'}">Expediente digital</button><button data-nav="mail" aria-current="${cur==='mail'?'page':'false'}">Correo</button></nav>`;
+}
+function vInbox(){
+  let rs = visible().filter(r => (!fTipo || r.tipo===fTipo) && (!fEstado || r.estado===fEstado));
+  const q = fq.trim().toLowerCase();
+  if (q) rs = rs.filter(r => EST[r.est].nombre.toLowerCase().includes(q) || pad4(r.num).includes(q));
+  rs.sort((a,b)=>a.creada-b.creada);
+  const all = visible();
+  const counts = VERSION>=2 ? `<div class="counts"><div><b>${all.filter(pendingFor).length}</b>Pendientes para mí</div><div><b>${all.filter(r=>pendingFor(r)&&r.tipo==='constancia').length}</b>Constancias</div><div><b>${all.filter(r=>pendingFor(r)&&r.tipo==='justificacion').length}</b>Justificaciones</div></div>` : '';
+  return `<main><div class="shell">${side('inbox')}<section><span class="stag">P6</span><h1>Bandeja de solicitudes</h1><p class="sub">${me.rol==='guia'?`Justificaciones de la sección ${esc(me.seccion)}`:me.rol==='direccion'?'Constancias de la institución':'Todas las solicitudes'} · ordenadas por fecha, la más antigua primero.</p>
+  ${counts}
+  <div class="filters"><div><label for="fT" style="margin-top:0">Tipo de trámite</label><select id="fT"><option value="">Todos</option><option value="constancia" ${fTipo==='constancia'?'selected':''}>Constancias</option><option value="justificacion" ${fTipo==='justificacion'?'selected':''}>Justificaciones</option></select></div>
+  <div><label for="fE" style="margin-top:0">Estado</label><select id="fE"><option value="">Todos</option>${['Recibida','En revisión','Aprobada','Rechazada','Lista'].map(s=>`<option ${fEstado===s?'selected':''}>${s}</option>`).join('')}</select></div>
+  <div class="q"><label for="fQ" style="margin-top:0">Buscar</label><input id="fQ" type="text" placeholder="Nombre del estudiante o número" value="${esc(fq)}"></div></div>
+  <div class="scroll"><table class="stack"><thead><tr><th>N.°</th><th>Estudiante</th><th>Sección</th><th>Tipo</th><th>Fecha</th><th>Estado</th><th><span class="sr">Acción</span></th></tr></thead><tbody>
+  ${rs.length?rs.map(r=>`<tr class="${pendingFor(r)?'pend':''}"><td class="num">${pad4(r.num)}</td><td>${esc(EST[r.est].nombre)}</td><td>${esc(EST[r.est].seccion)}</td><td>${r.tipo==='constancia'?'Constancia':'Justificación'}</td><td class="num">${fmtDT(r.creada)}</td><td>${chip(r.estado)}${r.asig&&pendingFor(r)?'<br><small style="color:var(--muted)">Pendiente para usted</small>':''}</td><td><button class="btn ${pendingFor(r)?'':'sec'}" data-open="${r.num}">${pendingFor(r)?'Revisar':'Ver'}</button></td></tr>`).join(''):'<tr><td colspan="7">No hay solicitudes con estos filtros.</td></tr>'}
+  </tbody></table></div></section></div></main>`;
+}
+
+/* ---------- P7 detalle ---------- */
+function vDetail(){
+  const r = S.find(x=>x.num===sel); const e = EST[r.est];
+  if (me.rol==='secretaria' && r.estado==='Recibida') { r.estado='En revisión'; r.hist.push(H('En revisión',new Date(),'Secretaría','Secretaría abrió la solicitud')); notifySol(r,'está en revisión'); }
+  const can = pendingFor(r);
+  let acts = '';
+  if (can) {
+    const ap = me.rol==='secretaria' ? (r.tipo==='constancia'?'Datos correctos: enviar a Dirección':'Cumple requisitos: avisar al profesor guía')
+             : me.rol==='direccion' ? 'Aprobar y aplicar sello electrónico' : 'Aprobar con firma electrónica';
+    acts = `<h2>Resolver</h2><label for="obs">Observación <span class="hint">(obligatoria para rechazar)</span></label><textarea id="obs" maxlength="400"></textarea><div class="err" id="eO"></div>
+    <div class="acts"><button class="btn" id="aOk">${ap}</button><button class="btn danger" id="aNo">Rechazar</button></div>
+    <p class="hint">${me.rol==='secretaria'&&r.tipo==='constancia'?'La constancia se genera desde la plantilla; Dirección la revisa antes de aplicar el sello.':me.rol==='secretaria'?'Al aprobar, el profesor guía recibe el aviso para firmar.':me.rol==='direccion'?'Al aprobar se aplica el sello electrónico, el código QR y se genera el PDF.':'Al aprobar, la ausencia queda justificada y se avisa a la familia.'}</p>`;
+  } else {
+    acts = `<h2>Estado</h2><p>${chip(r.estado)}</p><p class="hint">${r.asig&&!['Rechazada','Lista'].includes(r.estado)?`Pendiente de ${esc(ROLE[r.asig])}.`:'Sin acciones pendientes para su rol.'}</p>`;
+  }
+  const f = files[r.num];
+  const att = r.tipo==='justificacion' ? `<h2 style="margin-top:18px">Comprobante adjunto</h2><div class="att" style="display:block"><b>${esc(r.datos.adj.name)}</b> <small style="color:var(--muted)">· ${(r.datos.adj.size/1024).toFixed(0)} KB</small>${f&&f.type.startsWith('image/')?`<img src="${f.url}" alt="Vista previa del comprobante">`:''}</div>` : '';
+  const elapsed = VERSION>=2 ? `<dt>Tiempo del trámite</dt><dd>${dur(((r.estado==='Lista'||r.estado==='Rechazada')?r.hist[r.hist.length-1].fecha:new Date())-r.creada)}</dd>` : '';
+  return `<main><div class="shell">${side('inbox')}<section><span class="stag">P7</span><button class="btn sec" id="bk" style="margin-bottom:12px">← Volver a la bandeja</button>
+  <h1>Solicitud N.° ${pad4(r.num)} · ${r.tipo==='constancia'?'Constancia':'Justificación'}</h1><p class="sub">${chip(r.estado)}</p>
+  <div class="detail"><div><div class="card"><dl class="kv"><dt>Estudiante</dt><dd>${esc(e.nombre)}</dd><dt>Cédula</dt><dd>${esc(e.cedula)}</dd><dt>Sección</dt><dd>${esc(e.seccion)}</dd>
+  ${r.tipo==='constancia'?`<dt>Tipo</dt><dd>${esc(r.datos.tipoC)}</dd><dt>Institución o motivo</dt><dd>${esc(r.datos.motivo||'—')}</dd>`:`<dt>Fechas</dt><dd>${fmtD(r.datos.desde)} al ${fmtD(r.datos.hasta)}</dd><dt>Motivo</dt><dd>${esc(r.datos.motivo)}</dd><dt>Detalle</dt><dd>${esc(r.datos.detalle||'—')}</dd>`}
+  <dt>Enviada</dt><dd>${fmtDT(r.creada)}</dd>${elapsed}</dl>${att}
+  ${r.tipo==='constancia'?`<div class="acts"><button class="btn sec" data-doc="${r.num}">${r.estado==='Lista'?'Ver constancia sellada':'Ver borrador de la constancia'}</button></div>`:''}</div>
+  <div class="card" style="margin-top:16px"><h2>Historial de estados</h2><ul class="tl">${r.hist.map(h=>`<li>${chip(h.estado)} ${esc(h.nota)}<small>${fmtDT(h.fecha)} · ${esc(h.por)}</small></li>`).join('')}</ul></div></div>
+  <div class="card">${acts}</div></div></section></div></main>`;
+}
+
+/* ---------- P8 documento y expediente ---------- */
+function qr(c){
+  let h=0; for (const ch of c) h=(h*31+ch.charCodeAt(0))>>>0;
+  let cells=''; const n=21;
+  for (let y=0;y<n;y++) for (let x=0;x<n;x++){
+    const finder=(x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13);
+    let on;
+    if (finder){ const fx=x>13?x-14:x, fy=y>13?y-14:y; on=(fx===0||fx===6||fy===0||fy===6)||(fx>1&&fx<5&&fy>1&&fy<5); }
+    else { h=(h*1103515245+12345)>>>0; on=(h>>16)&1; }
+    if (on) cells+=`<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  }
+  return `<svg width="96" height="96" viewBox="-1 -1 23 23" role="img" aria-label="Código QR de verificación"><rect x="-1" y="-1" width="23" height="23" fill="#fff"/><g fill="#111">${cells}</g></svg>`;
+}
+function docHtml(r){
+  const e = EST[r.est]; const final = r.estado==='Lista'; const d = r.doc;
+  const anio = new Date().getFullYear();
+  if (r.tipo==='constancia') {
+    const cuerpo = {
+      'Constancia de estudio':`es estudiante regular de esta institución, matriculado(a) en la sección ${esc(e.seccion)} durante el curso lectivo ${anio}.`,
+      'Constancia de matrícula':`se encuentra debidamente matriculado(a) en la sección ${esc(e.seccion)} para el curso lectivo ${anio}.`,
+      'Constancia de notas':`cursa la sección ${esc(e.seccion)} y sus calificaciones constan en el expediente académico de la institución.`,
+      'Constancia de conducta':`cursa la sección ${esc(e.seccion)} y no registra boletas de conducta en el presente curso lectivo.`
+    }[r.datos.tipoC];
+    return `<div class="doc">${final?'':'<div class="wm">BORRADOR · SIN SELLO</div>'}<div class="lh"><div><b>Colegio Técnico Profesional San Sebastián</b><br>Dirección</div><div style="text-align:right">Constancia N.° ${pad4(r.num)}<br>${final?fmtD(d.emitido):'Pendiente de aprobación'}</div></div>
+    <h3>${esc(r.datos.tipoC.toUpperCase())}</h3>
+    <p>La Dirección hace constar que <b>${esc(e.nombre)}</b>, cédula <b>${esc(e.cedula)}</b>, ${cuerpo}</p>
+    <p>Se extiende a solicitud de la persona interesada${r.datos.motivo?`, para efectos de: ${esc(r.datos.motivo)}`:''}.</p>
+    <div class="foot"><div class="seal">${final?`Sellado electrónicamente por la Dirección<br>${fmtDT(d.emitido)}`:'Espacio para el sello electrónico<br>(se aplica solo después de la aprobación de Dirección)'}</div>
+    <div style="text-align:center">${final?qr(d.codigo):'<div style="width:96px;height:96px;border:1px dashed #999;display:grid;place-items:center;font-size:12px">QR</div>'}<div style="font-size:12px">Código: ${final?esc(d.codigo):'—'}</div></div></div></div>`;
+  }
+  return `<div class="doc"><div class="lh"><div><b>Colegio Técnico Profesional San Sebastián</b><br>Dirección</div><div style="text-align:right">Justificación N.° ${pad4(r.num)}<br>${fmtD(d.emitido)}</div></div>
+  <h3>COMPROBANTE DE JUSTIFICACIÓN DE AUSENCIA</h3>
+  <p>Se registra como <b>justificada</b> la ausencia de <b>${esc(e.nombre)}</b> (sección ${esc(e.seccion)}) del ${fmtD(r.datos.desde)} al ${fmtD(r.datos.hasta)}, por motivo de ${esc(r.datos.motivo.toLowerCase())}.</p>
+  <p>Comprobante revisado: ${esc(r.datos.adj.name)}.</p>
+  <div class="foot"><div class="seal">Firmado electrónicamente por el profesor guía<br>${fmtDT(d.emitido)}</div><div style="text-align:center">${qr(d.codigo)}<div style="font-size:12px">Código: ${esc(d.codigo)}</div></div></div></div>`;
+}
+function vDoc(){
+  const pool = isSol() ? S.filter(r=>r.est===me.est) : (me.rol==='guia'?visible():S);
+  const archived = pool.filter(r=>r.estado==='Lista');
+  let r = sel ? S.find(x=>x.num===sel) : null;
+  if (!r) r = archived[0];
+  const ests = [...new Set(archived.map(x=>x.est))];
+  return `<main><div class="${isSol()?'narrow':'shell'}">${isSol()?'':side('exp')}<section><span class="stag">P8</span>
+  ${isSol()?'<button class="btn sec" id="bk" style="margin-bottom:12px">← Mis solicitudes</button>':''}
+  <h1>${r&&r.estado!=='Lista'?'Vista previa de la constancia':'Expediente digital'}</h1><p class="sub">${isSol()?'Documentos archivados de '+esc(EST[me.est].nombre):'Documentos emitidos y archivados por estudiante'}</p>
+  <div class="detail"><div>${r?docHtml(r):'<p class="sub">No hay documentos.</p>'}
+  ${r&&r.estado==='Lista'?`<div class="acts"><button class="btn" id="dl">Descargar PDF</button></div><p class="hint" id="dlh"></p>`:''}</div>
+  <div class="card"><h2>Expediente</h2>${ests.map(k=>`<p style="margin:10px 0 6px;font-weight:700">${esc(EST[k].nombre)} · ${esc(EST[k].seccion)}</p>${archived.filter(x=>x.est===k).map(x=>`<button class="list-btn" data-doc="${x.num}" aria-current="${r&&x.num===r.num}"><span>${x.tipo==='constancia'?esc(x.datos.tipoC):'Justificación de ausencia'}<br><small style="color:var(--muted)">N.° ${pad4(x.num)} · ${fmtD(x.doc.emitido)}</small></span>${chip('Lista')}</button>`).join('')}`).join('')||'<p class="sub">Aún no hay documentos archivados.</p>'}</div></div></section></div></main>`;
+}
+
+/* ---------- acciones ---------- */
+function create(tipo, datos){
+  seq++; const r = {num:seq, tipo, est:me.est, sol:meId, estado:'Recibida', asig:'secretaria', creada:new Date(), datos, hist:[H('Recibida',new Date(),me.nombre,'Solicitud enviada en línea')]};
+  S.push(r); notifySol(r,'fue recibida'); notify('karla', r.num, 'nueva solicitud en la bandeja'); return r;
+}
+function resolve(r, ok, obs){
+  const now = new Date();
+  if (!ok) { r.estado='Rechazada'; r.asig=null; r.obs=obs; r.hist.push(H('Rechazada',now,ROLE[me.rol],obs)); notifySol(r,'fue rechazada (ver observación)'); toast(`Solicitud N.° ${pad4(r.num)} rechazada; se avisó por correo.`); return; }
+  if (me.rol==='secretaria' && r.tipo==='constancia') { r.asig='direccion'; r.hist.push(H('En revisión',now,'Secretaría',obs||'Datos verificados; constancia generada desde la plantilla y enviada a Dirección')); notify('jorge',r.num,'constancia pendiente de aprobación'); toast('Enviada a Dirección para su aprobación.'); }
+  else if (me.rol==='secretaria') { r.asig='guia'; r.hist.push(H('En revisión',now,'Secretaría',obs||'Cumple requisitos; se avisó al profesor guía')); notify('daniel',r.num,'justificación pendiente de su firma'); toast('Se avisó al profesor guía.'); }
+  else if (me.rol==='direccion') { r.estado='Aprobada'; r.hist.push(H('Aprobada',now,'Dirección',obs||'Constancia aprobada')); const t0=performance.now(); r.doc={codigo:code(), emitido:now}; r.estado='Lista'; r.asig=null; r.hist.push(H('Lista',now,'Sistema',`Sello electrónico y código QR aplicados; PDF generado en ${((performance.now()-t0)/1000+0.4).toFixed(1)} s y archivado`)); notifySol(r,'está lista para descargar'); toast('Constancia aprobada, sellada y archivada.'); }
+  else if (me.rol==='guia') { r.estado='Aprobada'; r.hist.push(H('Aprobada',now,me.nombre,obs||'Firma electrónica del profesor guía')); r.doc={codigo:code(), emitido:now}; r.estado='Lista'; r.asig=null; r.hist.push(H('Lista',now,'Sistema','Ausencia registrada como justificada y archivada en el expediente')); notifySol(r,'fue aprobada y archivada'); toast('Justificación aprobada con firma electrónica.'); }
+}
+
+function bind(){
+  const on = (id, ev, fn) => { const el = document.getElementById(id); if (el) el.addEventListener(ev, fn); };
+  document.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{ pick=b.dataset.u; render(); });
+  on('bIn','click',()=>{ meId=pick; me=USERS[pick]; lastCreated=null; go(isSol()?'mine':'inbox', null); });
+  on('bOut','click',()=>{ me=null; meId=null; go('login'); });
+  on('bMail','click',()=>{ mailSel=0; go('mail'); });
+  on('bBell','click',()=>{ panel = panel?null:'n'; renderPanel(); });
+  on('goC','click',()=>{ draft={}; lastCreated=null; go('const'); });
+  on('goJ','click',()=>{ lastCreated=null; go('just'); });
+  on('again','click',()=>{ draft={}; go('const'); });
+  on('back','click',()=>go('mine'));
+  on('bk','click',()=>go(isSol()?'mine':'inbox', null));
+  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ filtro=b.dataset.f; render(); });
+  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{ mailSel=0; go(b.dataset.nav, null); });
+  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{ const n=+b.dataset.open; if (isSol()) { go('mine'); const el=document.getElementById('r'+n); if (el) el.scrollIntoView(); } else go('detail', n); });
+  document.querySelectorAll('[data-doc]').forEach(b=>b.onclick=()=>go('doc', +b.dataset.doc));
+  document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ mailSel=+b.dataset.m; render(); });
+  on('fT','change',e=>{ fTipo=e.target.value; render(); });
+  on('fE','change',e=>{ fEstado=e.target.value; render(); });
+  on('fQ','input',e=>{ fq=e.target.value; const p=e.target.selectionStart; render(); const q=$('#fQ'); q.focus(); q.setSelectionRange(p,p); });
+  on('dl','click',()=>{ $('#dlh').textContent='Documento generado en PDF con sello electrónico y código de verificación.'; });
+  // P2
+  if (view==='const') {
+    const chk = () => {
+      draft = {tipoC:$('#cT').value, motivo:$('#cM').value, correo:$('#cE').value, priv:$('#cP').checked};
+      const mailOk = okMail(draft.correo.trim());
+      $('#eE').textContent = draft.correo && !mailOk ? 'Escriba un correo válido.' : '';
+      const ok = draft.tipoC && mailOk && draft.priv;
+      $('#cSend').disabled = !ok; $('#cHint').textContent = ok ? 'Todo listo para enviar.' : 'Complete los campos obligatorios para habilitar el envío.';
+      return ok;
+    };
+    ['cT','cM','cE','cP'].forEach(id=>{ on(id,'input',chk); on(id,'change',chk); }); chk();
+    on('fC','submit',e=>{ e.preventDefault(); if (!chk()) return; const r=create('constancia',{tipoC:draft.tipoC, motivo:draft.motivo.trim()}); draft={}; lastCreated=r.num; toast(`Solicitud enviada. Número: ${pad4(r.num)}`); go('mine'); });
+  }
+  // P3
+  if (view==='just') {
+    let fileOk=false, file=null;
+    const chk = () => {
+      const d=$('#jD').value, h=$('#jH').value; let msg='', vencido=false;
+      const today=dayOnly(new Date());
+      if (d && h) {
+        const D=new Date(d+'T00:00'), Hh=new Date(h+'T00:00');
+        if (Hh<D) msg='La fecha final no puede ser anterior a la inicial.';
+        else if (Hh>today) msg='No se puede justificar una fecha futura.';
+        else { const lim=addBiz(Hh,3); vencido = today>lim;
+          $('#jPlazo').className = 'alert '+(vencido?'bad':'warn');
+          $('#jPlazo').textContent = vencido ? `El plazo para justificar venció${VERSION>=2?' el '+fmtD(lim):''}. El sistema no permite el envío; consulte con Orientación.` : (VERSION>=2?`Tiene hasta el ${fmtD(lim)} para justificar esta ausencia (3 días hábiles).`:'Plazo: 3 días hábiles después de la ausencia.');
+        }
+      }
+      $('#eF').textContent=msg;
+      const ok = d && h && !msg && !vencido && $('#jM').value && fileOk;
+      $('#jSend').disabled=!ok; return ok;
+    };
+    ['jD','jH','jM','jT'].forEach(id=>{ on(id,'input',chk); on(id,'change',chk); });
+    on('jA','change',e=>{ file=e.target.files[0]; fileOk=false; $('#eA').textContent='';
+      if (file) { const okT = file.type==='application/pdf' || /^image\/(jpeg|png|webp|gif)$/.test(file.type);
+        if (!okT) $('#eA').textContent='Formato no permitido. Adjunte un PDF o una imagen.';
+        else if (file.size>5*1024*1024) $('#eA').textContent='El archivo supera el máximo de 5 MB.';
+        else fileOk=true; }
+      chk(); });
+    on('fJ','submit',e=>{ e.preventDefault(); if (!chk()) return;
+      const r=create('justificacion',{desde:new Date($('#jD').value+'T00:00'), hasta:new Date($('#jH').value+'T00:00'), motivo:$('#jM').value, detalle:$('#jT').value.trim(), adj:{name:file.name, type:file.type, size:file.size}});
+      files[r.num]={type:file.type, url:URL.createObjectURL(file)};
+      lastCreated=r.num; toast(`Justificación enviada. Número: ${pad4(r.num)}`); go('mine'); });
+  }
+  // P7
+  if (view==='detail') {
+    const r=S.find(x=>x.num===sel);
+    const act = ok => { const o=$('#obs').value.trim(); if (!ok && !o) { $('#eO').textContent='Para rechazar debe escribir una observación.'; $('#obs').focus(); return; }
+      const run = () => { resolve(r, ok, o); render(); };
+      if (VERSION>=2) modal(ok?'¿Confirmar aprobación?':'¿Confirmar rechazo?', ok?'Esta acción avanza la solicitud y notifica a las personas involucradas.':'La persona solicitante recibirá la observación por correo.', ok?'Sí, aprobar':'Sí, rechazar', run); else run(); };
+    on('aOk','click',()=>act(true)); on('aNo','click',()=>act(false));
+  }
+}
+function renderPanel(){
+  const old=document.getElementById('npanel'); if (old) old.remove();
+  if (panel!=='n') return;
+  const ns=NOTIF.filter(x=>x.uid===meId);
+  const el=document.createElement('div'); el.id='npanel'; el.className='card panel'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Avisos');
+  el.innerHTML=`<h2>Avisos</h2>${ns.length?ns.map(n=>`<button class="list-btn ${n.leida?'':'unread'}" data-open="${n.num}"><span>N.° ${pad4(n.num)}: ${esc(n.texto)}<br><small style="color:var(--muted);font-weight:400">${fmtDT(n.fecha)}</small></span></button>`).join(''):'<p class="sub">No hay avisos nuevos.</p>'}`;
+  document.body.appendChild(el); ns.forEach(n=>n.leida=true);
+  el.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{ const n=+b.dataset.open; panel=null; if (isSol()) go('mine'); else go('detail', n); });
+}
+function render(){
+  document.body.classList.toggle('v2', VERSION>=2);
+  const V = {login:vLogin, mine:vMine, const:vConst, just:vJust, mail:vMail, inbox:vInbox, detail:vDetail, doc:vDoc, exp:vDoc};
+  if (!me) view='login';
+  if (view==='exp') sel=null;
+  const body = V[view]();
+  $('#app').innerHTML = (me?header():'') + body;
+  bind(); renderPanel();
+}
+render();
+}
+</script>
+</body>
+</html>
